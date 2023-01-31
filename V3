@@ -1,0 +1,69 @@
+// ==UserScript==
+// @name         ZyBooks Auto Clicker
+// @namespace    http://tampermonkey.net/
+// @version      0.2
+// @description  Automatically click through participation activities on Zybooks
+// @author       ZyBooks Auto Clicker
+// @match        https://*.zybooks.com/*
+// @icon         https://www.google.com/s2/favicons?sz=64&domain=mozilla.org
+// @grant        none
+// @license MIT
+// ==/UserScript==
+
+
+var done = false;
+var count = 0;
+var answerIndex = 0;
+
+function zy(){
+
+var e = Array.from(document.getElementsByClassName("zb-button"));
+var s = Array.from(document.getElementsByClassName("title"));
+var c = Array.from(document.getElementsByClassName("speed-control"));
+var mc = Array.from(document.querySelectorAll(".question-choices input[type='radio']"));
+var answerFields = Array.from(document.getElementsByClassName("forfeit-answer"));
+
+e.forEach((i)=>{
+if (i.ariaLabel == "Play"){
+i.click();
+}
+});
+
+s.forEach((i)=>{
+if (i.innerHTML == "Start"){
+i.click();
+}
+if (i.innerHTML == "Show answer"){
+i.click();
+}
+});
+
+c.forEach((i)=>{
+if (i.children[0].children[0].value=="false"){
+i.children[0].children[0].click();
+}
+});
+
+if (mc.length > 0) {
+mc[count % mc.length].click();
+count++;
+}
+
+if (answerFields.length > 0) {
+var answerField = document.querySelectorAll(".ember-text-area");
+answerField[answerIndex].value = answerFields[answerIndex].innerHTML.trim();
+answerIndex++;
+if (answerIndex >= answerFields.length) {
+done = true;
+}
+}
+}
+
+setInterval(zy, 700);
+
+// Check the answer
+if (done) {
+document.querySelector(".check-answer").click();
+done = false;
+answerIndex = 0;
+}
